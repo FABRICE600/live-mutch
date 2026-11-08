@@ -1,0 +1,10 @@
+require('dotenv').config();
+const express=require('express'),cors=require('cors'),app=express();
+const allowed=(process.env.FRONTEND_URL||'http://localhost:5173').split(',').map(x=>x.trim());
+app.use(cors({origin:(origin,cb)=>!origin||allowed.includes(origin)?cb(null,true):cb(new Error('CORS origin not allowed'))}));
+app.use(express.json());
+app.get('/',(_req,res)=>res.json({message:'Live Mutch API is running',sports:['football','basketball','tennis','cricket']}));
+app.get('/health',(_req,res)=>res.json({success:true,status:'ok'}));
+app.use('/api',require('./routes/sportsRoutes'));
+app.use((err,_req,res,_next)=>{const status=err.response?.status||500;console.error('API error:',err.response?.data||err.message);res.status(status).json({success:false,message:err.response?.data?.message||err.message||'Sports provider unavailable'})});
+const PORT=process.env.PORT||5000;app.listen(PORT,'0.0.0.0',()=>console.log('Live Mutch backend listening on '+PORT));
