@@ -1,0 +1,15 @@
+const router=require('express').Router();
+const football=require('../services/footballService'), basketball=require('../services/basketballService'), tennis=require('../services/tennisService'), cricket=require('../services/cricketService');
+const wrap=fn=>async(req,res,next)=>{try{res.json({success:true,data:await fn(req)})}catch(e){next(e)}};
+router.get('/football/live',wrap(()=>football.live()));
+router.get('/football/fixtures',wrap(req=>football.fixtures(req.query.date)));
+router.get('/football/results',wrap(()=>football.results()));
+router.get('/football/competitions',wrap(()=>football.competitions()));
+router.get('/football/standings',wrap(req=>football.standings(req.query.competition||'PL')));
+router.get('/football/teams',wrap(req=>football.teams(req.query.competition||'PL')));
+router.get('/basketball/games',wrap(req=>basketball.games(req.query.date)));
+router.get('/basketball/teams',wrap(()=>basketball.teams()));
+router.get('/basketball/players',wrap(()=>basketball.players()));
+router.get('/tennis/live',wrap(()=>tennis.live()));
+router.get('/cricket/live',wrap(()=>cricket.live()));
+module.exports=router;
